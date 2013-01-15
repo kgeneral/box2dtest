@@ -7,12 +7,15 @@ import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.util.Log;
 
 import com.dykim1983.box2dtest.opengl.polygon.Square;
 
 public class OpenGLRenderer implements Renderer {
 	
 	private Square square;
+	
+	private float ypos = 0; 
 	
 	public OpenGLRenderer() {
 		// Initialize our square. 
@@ -22,12 +25,13 @@ public class OpenGLRenderer implements Renderer {
 		Thread th = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				handler.post(new Runnable() {
-					@Override
-					public void run() {
-						new WorldTask().execute();
-					}
-				});
+//				handler.post(new Runnable() {
+//					@Override
+//					public void run() {
+//						new WorldTask().execute(ypos);
+//					}
+//				});
+				ypos += 0.1f;
 			}
 		});
         th.start();
@@ -74,13 +78,12 @@ public class OpenGLRenderer implements Renderer {
 		// Replace the current matrix with the identity matrix
 		gl.glLoadIdentity();
 		
-		
-		
-		
-		gl.glTranslatef(0, 0, -10);
+		gl.glTranslatef(0, 0, -10 + ypos);
 		
 		// Draw our square.
 		square.draw(gl); // ( NEW )
+		
+		ypos += 0.1f;
 	}
 
 	/*
@@ -108,20 +111,30 @@ public class OpenGLRenderer implements Renderer {
 	}
 	
 	
-	private class WorldTask extends AsyncTask<String, Integer, Boolean> {
+	private class WorldTask extends AsyncTask<Float, Long, Long> {
 		private long counter = 0;
 		
-	    protected Boolean doInBackground(String... urls) {
+	    protected Long doInBackground(Float... yposes) {
 	    	counter++;
-	    	return false;
+	    	for (Float ypos : yposes) {
+	    		ypos += 0.1f;
+	        }
+	    	return counter;
 	    }
 
-	    protected void onProgressUpdate(Integer... progress) {
-	    	
+	    protected void onProgressUpdate(Long... progress) {
+	    	//Log.i("OpenGLRenderer.class", String.format("%d", counter));
+	    	if(60L > counter) {
+	    		//Log.i("OpenGLRenderer.class", String.format("%f", ypos));
+	    		//Log.i("OpenGLRenderer.class", String.format("%d", counter));
+	    	}
 	    }
 
-	    protected void onPostExecute(Boolean isLoaded) {
-	    	
+	    protected void onPostExecute(Long counter) {
+	    	Log.i("OpenGLRenderer.class", String.format("%d", counter));
+	    	if(60L > counter) {
+	    		
+	    	} else return;
 	    }
 	}
 }
