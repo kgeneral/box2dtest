@@ -5,6 +5,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.util.Log;
 
 import com.dykim1983.box2dtest.opengl.polygon.Square;
 
@@ -15,8 +18,23 @@ public class OpenGLRenderer implements Renderer {
 	private float ypos = 0; 
 	
 	public OpenGLRenderer() {
-		// Initialize our square. 
-		square = new Square();
+		// Initialize our square. 		
+		square = new Square();		
+		final Handler handler = new Handler();		
+		Thread th = new Thread(new Runnable() {			
+			@Override			
+			public void run() {
+				handler.post(new Runnable() {
+					@Override	
+					public void run() {
+							new WorldTask().execute(ypos);
+					}
+				});
+				ypos += 0.1f;
+			}		
+		});
+		th.start();
+		
 	}
 	
 	/*
@@ -92,7 +110,40 @@ public class OpenGLRenderer implements Renderer {
 		gl.glLoadIdentity();// OpenGL docs.
 	}
 	
-	
+	private class WorldTask extends AsyncTask<Float, Long, Long> {
+		private long counter = 0;
+		
+	    protected Long doInBackground(Float... yposes) {
+	    	
+	    	for (Float ypos : yposes) {
+	    		while(60L > counter) {
+	    			ypos += 0.1f;
+	    			//Log.i("OpenGLRenderer.class", String.format("%f", ypos));
+	    			counter++;
+	    			publishProgress(counter);
+
+		    	}
+	        }
+	    	return counter;
+	    }
+
+	    protected void onProgressUpdate(Long... progress) {
+	    	
+	    	Log.i("OpenGLRenderer.class", String.format("%d", progress[0]));
+	    	//Log.i("OpenGLRenderer.class", String.format("%f", ypos));
+	    	if(60L > counter) {
+	    		//Log.i("OpenGLRenderer.class", String.format("%f", ypos));
+	    		//Log.i("OpenGLRenderer.class", String.format("%d", counter));
+	    	}
+	    }
+
+	    protected void onPostExecute(Long counter) {
+	    	Log.i("OpenGLRenderer.class", String.format("%d", counter));
+	    	if(60L > counter) {
+	    		
+	    	} else return;
+	    }
+	}
 	
 }
 
