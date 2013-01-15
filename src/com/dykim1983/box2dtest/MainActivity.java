@@ -18,7 +18,6 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN); // (NEW)
         
-        
  		GLSurfaceView view = new GLSurfaceView(this);
    		view.setRenderer(new OpenGLRenderer());
    		setContentView(view);

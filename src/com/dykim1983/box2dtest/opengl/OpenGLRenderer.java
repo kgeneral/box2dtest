@@ -5,6 +5,8 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
+import android.os.AsyncTask;
+import android.os.Handler;
 
 import com.dykim1983.box2dtest.opengl.polygon.Square;
 
@@ -15,6 +17,20 @@ public class OpenGLRenderer implements Renderer {
 	public OpenGLRenderer() {
 		// Initialize our square. 
 		square = new Square();
+		
+		final Handler handler = new Handler();
+		Thread th = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						new WorldTask().execute();
+					}
+				});
+			}
+		});
+        th.start();
 	}
 	
 	/*
@@ -40,10 +56,7 @@ public class OpenGLRenderer implements Renderer {
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, // OpenGL docs.
                           GL10.GL_NICEST);
 		
-		
-		
-		
-		
+		GLU.gluLookAt(gl, 0, 0, -5, 0, 0, -1, 0, 1, 0);
 	}
 
 	/*
@@ -61,8 +74,10 @@ public class OpenGLRenderer implements Renderer {
 		// Replace the current matrix with the identity matrix
 		gl.glLoadIdentity();
 		
-		// Translates 4 units into the screen.
-		gl.glTranslatef(0, 0, -4); // OpenGL docs
+		
+		
+		
+		gl.glTranslatef(0, 0, -10);
 		
 		// Draw our square.
 		square.draw(gl); // ( NEW )
@@ -90,6 +105,24 @@ public class OpenGLRenderer implements Renderer {
 		gl.glMatrixMode(GL10.GL_MODELVIEW);// OpenGL docs.
 		// Reset the modelview matrix
 		gl.glLoadIdentity();// OpenGL docs.
+	}
+	
+	
+	private class WorldTask extends AsyncTask<String, Integer, Boolean> {
+		private long counter = 0;
+		
+	    protected Boolean doInBackground(String... urls) {
+	    	counter++;
+	    	return false;
+	    }
+
+	    protected void onProgressUpdate(Integer... progress) {
+	    	
+	    }
+
+	    protected void onPostExecute(Boolean isLoaded) {
+	    	
+	    }
 	}
 }
 
